@@ -1,0 +1,59 @@
+openapi: 3.0.4
+info:
+  title: M-eQuotes Sales API
+  description: |
+    API for creating and managing quotes for Apple CS Sales.
+  version: 1.0.0
+  x-server-stub-package: com.pp.cs.sales.quotes
+servers:
+  - url: /api/sales/quotes/v1
+    description: Quotes API base URL
+tags:
+  - name: quotes
+    description: Create and manage quotes
+paths:
+  /create/quotes:
+    post:
+      tags:
+        - quotes
+      summary: Create quotes
+      description: Creates a quote from the given list of offers.
+      operationId: createQuotes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Offer'
+      responses:
+        '201':
+          description: Quote created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteResponse'
+        '400':
+          description: Invalid request (e.g. invalid or empty list of offers)
+        default:
+          description: Unexpected error
+components:
+  schemas:
+    Offer:
+      type: object
+      description: Offer to include in the quote
+      properties:
+        offerCode:
+          type: string
+          description: Offer code
+        productCode:
+          type: string
+          description: Product code
+    QuoteResponse:
+      type: object
+      description: Response after creating a quote
+      properties:
+        quoteId:
+          type: string
+          description: Identifier of the created quote
