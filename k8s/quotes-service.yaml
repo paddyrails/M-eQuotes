@@ -1,0 +1,68 @@
+# CS Sales Quotes Service - for local Minikube
+# Build: from repo root: docker build -t quotes-service:latest -f M-eQuotes/Dockerfile M-eQuotes
+# Load: minikube image load quotes-service:latest
+# Deploy: kubectl apply -f M-eQuotes/k8s/quotes-service.yaml
+# Requires: postgres (see M-eCatalog/k8s/postgres.yaml and README)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quotes-service
+  namespace: cs-sales
+  labels:
+    app: quotes-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quotes-service
+  template:
+    metadata:
+      labels:
+        app: quotes-service
+    spec:
+      containers:
+        - name: quotes-service
+          image: quotes-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9082
+          env:
+            - name: DB_URL
+              value: "jdbc:postgresql://postgres:5432/cs-sales-quotes"
+            - name: DB_USERNAME
+              value: cs_sales_user
+            - name: DB_PASSWORD
+              value: cs_sales_user
+          readinessProbe:
+            tcpSocket:
+              port: 9082
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 9082
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quotes-service
+  namespace: cs-sales
+  labels:
+    app: quotes-service
+spec:
+  selector:
+    app: quotes-service
+  ports:
+    - port: 9082
+      targetPort: 9082
+      name: http
+  type: ClusterIP
