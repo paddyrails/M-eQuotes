@@ -7,6 +7,7 @@ import com.pp.cs.sales.quotes.entity.OfferEntity;
 import com.pp.cs.sales.quotes.entity.QuoteEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,5 +46,11 @@ public class QuotesServiceImpl implements QuotesService {
         newQuoteRespDto.setOffers(createdQuote.getOffers());
 
         return newQuoteRespDto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<QuoteEntity> getAllQuotes() {
+        return this.quotesDao.findAllWithOffers();
     }
 }

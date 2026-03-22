@@ -1,0 +1,19 @@
+"""
+Quote and nested offers exposed to GraphQL (no ids / timestamps).
+"""
+type Offer {
+    offerCode: String
+    productCode: String
+    basePrice: Float
+    calculatedPrice: Float
+    discountApplied: Float
+    price: Float
+}
+
+type Quote {
+    offers: [Offer!]!
+}
+
+type Query {
+    quotes: [Quote!]!
+}
